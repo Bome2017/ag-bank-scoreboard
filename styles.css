@@ -114,3 +114,8 @@ th{color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--pan
   border-bottom:1px solid var(--line);
 }
 .inline-link:hover{ color: var(--accent); }
+
+
+.brief-link-row{
+  margin-top: 12px;
+}
