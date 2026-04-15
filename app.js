@@ -88,11 +88,11 @@ async function main(){
     const baseTexas = parseCSV(texasTxt).map(r => ({...r,decile:toNum(r.decile),future_deterioration_rate:toNum(r.future_deterioration_rate)}));
     const failed = parseCSV(failedTxt).map(r => ({...r,watch_lead_q:toNum(r.watch_lead_q),critical_lead_q:toNum(r.critical_lead_q)}));
 
-    document.getElementById('headerMeta').innerHTML = `<span class="badge">Loaded ${fmtInt(latestRows.length)} latest-quarter rows</span>`;
-    setLoadStatus(`<span class="ok">Loaded all required files.</span>`);
-
     const latest = latestPeriod(macro);
     const current = macro.find(r => r.Period === latest);
+
+    document.getElementById('headerMeta').innerHTML = `<span class="badge">Loaded ${fmtInt(latestRows.length)} latest-quarter rows</span>`;
+    setLoadStatus(`<span class="ok">Loaded all required files</span> — ${latest} · ${fmtInt(current.banks)} banks scored`);
     document.getElementById('currentQuarterMeta').textContent = `Latest quarter: ${latest}`;
 
     document.getElementById('summaryStats').innerHTML = makeStats([
