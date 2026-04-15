@@ -1,3 +1,4 @@
+
 const FILES = {
   macro: 'output/macro_mhi_summary.csv',
   latestQuarter: 'output/latest_quarter_temporal.csv',
@@ -39,10 +40,6 @@ function fmtNum(v,d=2){ return (v===null||v===undefined||Number.isNaN(v)) ? '—
 function fmtInt(v){ return (v===null||v===undefined||Number.isNaN(v)) ? '—' : Math.round(Number(v)).toLocaleString(); }
 function latestPeriod(rows){ return rows.reduce((a,b)=> String(a.Period) > String(b.Period) ? a : b).Period; }
 function setLoadStatus(msg){ document.getElementById('loadStatus').innerHTML = msg; }
-function setStatusMeta(msg){
-  const el = document.getElementById('statusMeta');
-  if(el) el.textContent = msg;
-}
 function makeStats(items){ return items.map(x => `<div class="stat"><div class="label">${x.label}</div><div class="value">${x.value}</div></div>`).join(''); }
 function renderTable(elId, rows, cols, compact=false){
   const head = `<tr>${cols.map(c=>`<th class="${c.className||''}">${c.label}</th>`).join('')}</tr>`;
@@ -78,8 +75,6 @@ function spread(arr){ return arr.length ? Math.max(...arr)-Math.min(...arr) : Na
 async function main(){
   try{
     setLoadStatus('Loading CSV outputs…');
-    setStatusMeta('Latest quarter: loading · Banks scored: loading · Status: loading');
-
     const [macroTxt, latestTxt, compareTxt, mhiTxt, gTxt, texasTxt, failedTxt] = await Promise.all([
       fetchText(FILES.macro), fetchText(FILES.latestQuarter), fetchText(FILES.compare),
       fetchText(FILES.baseMHI), fetchText(FILES.baseG), fetchText(FILES.baseTexas), fetchText(FILES.failed)
@@ -98,7 +93,6 @@ async function main(){
 
     const latest = latestPeriod(macro);
     const current = macro.find(r => r.Period === latest);
-    setStatusMeta(`Latest quarter: ${latest} · Banks scored: ${fmtInt(current.banks)} · Status: ready`);
     document.getElementById('currentQuarterMeta').textContent = `Latest quarter: ${latest}`;
 
     document.getElementById('summaryStats').innerHTML = makeStats([
@@ -218,7 +212,6 @@ async function main(){
   } catch(err){
     console.error(err);
     setLoadStatus(`<span class="bad">Error:</span> ${err.message}`);
-    setStatusMeta('Latest quarter: unavailable · Banks scored: unavailable · Status: error');
   }
 }
 main();
