@@ -1,0 +1,2 @@
+test_a_lift,test_a_hi_rate,test_a_lo_rate,test_b_decile1,test_b_decile10,test_b_spread,test_b_monotonic,test_c_run1,test_c_run5,test_c_run10,mhi_spread,g_spread,texas_spread,mhi_monotonic,g_monotonic,texas_monotonic,failed_banks_matched,median_watch_lead_q,median_critical_lead_q
+1.79,85.18,47.53,6.73,88.12,81.39,1,74.17,88.98,92.19,81.39,81.44,44.49,1,1,0,573,12.0,1.0
