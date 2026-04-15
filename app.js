@@ -6,7 +6,8 @@ const FILES = {
   baseMHI: 'output/baseline_compare_mhi.csv',
   baseG: 'output/baseline_compare_g.csv',
   baseTexas: 'output/baseline_compare_texas_proxy.csv',
-  failed: 'output/failed_bank_leadtime_summary.csv'
+  failed: 'output/failed_bank_leadtime_summary.csv',
+  validation: 'output/validation_summary.csv'
 };
 
 async function fetchText(path){
@@ -75,9 +76,10 @@ function spread(arr){ return arr.length ? Math.max(...arr)-Math.min(...arr) : Na
 async function main(){
   try{
     setLoadStatus('Loading CSV outputs…');
-    const [macroTxt, latestTxt, compareTxt, mhiTxt, gTxt, texasTxt, failedTxt] = await Promise.all([
+    const [macroTxt, latestTxt, compareTxt, mhiTxt, gTxt, texasTxt, failedTxt, validationTxt] = await Promise.all([
       fetchText(FILES.macro), fetchText(FILES.latestQuarter), fetchText(FILES.compare),
-      fetchText(FILES.baseMHI), fetchText(FILES.baseG), fetchText(FILES.baseTexas), fetchText(FILES.failed)
+      fetchText(FILES.baseMHI), fetchText(FILES.baseG), fetchText(FILES.baseTexas), fetchText(FILES.failed),
+      fetchText(FILES.validation)
     ]);
 
     const macro = parseCSV(macroTxt).map(r => ({...r,banks:toNum(r.banks),mean_G:toNum(r.mean_G),median_G:toNum(r.median_G),median_MHI:toNum(r.median_MHI),p95_MHI:toNum(r.p95_MHI),critical:toNum(r.critical),watch:toNum(r.watch),diverging:toNum(r.diverging),stable:toNum(r.stable)}));
@@ -87,6 +89,7 @@ async function main(){
     const baseG = parseCSV(gTxt).map(r => ({...r,decile:toNum(r.decile),future_deterioration_rate:toNum(r.future_deterioration_rate)}));
     const baseTexas = parseCSV(texasTxt).map(r => ({...r,decile:toNum(r.decile),future_deterioration_rate:toNum(r.future_deterioration_rate)}));
     const failed = parseCSV(failedTxt).map(r => ({...r,watch_lead_q:toNum(r.watch_lead_q),critical_lead_q:toNum(r.critical_lead_q)}));
+    const val = parseCSV(validationTxt).map(r => {const o={}; for(const k in r) o[k]=toNum(r[k]); return o;})[0];
 
     const latest = latestPeriod(macro);
     const current = macro.find(r => r.Period === latest);
@@ -108,9 +111,9 @@ async function main(){
     ]);
 
     buildInterp('summaryInterp', [
-      {title:'Observation', text:`${latest} has ${fmtInt(current.critical)} Critical, ${fmtInt(current.watch)} Watch, and ${fmtInt(current.diverging)} Diverging banks. Median finite MHI is ${fmtNum(current.median_MHI,3)} and mean G is ${fmtNum(current.mean_G,3)}.`},
-      {title:'Constraint', text:'This is a structural warning snapshot, not a proof of insolvency or system-wide failure.'},
-      {title:'Relevance', text:'It shows where the live signal is concentrated before moving into rankings, cohorts, and validation.'}
+      {title:'Observation', text:`${latest} has ${fmtInt(current.critical)} Critical (G < 0.1), ${fmtInt(current.watch)} Watch (low G with surface outrunning structure), and ${fmtInt(current.diverging)} Diverging banks. Mean G (structural viability) is ${fmtNum(current.mean_G,3)}. Median finite MHI (divergence ratio) is ${fmtNum(current.median_MHI,3)}.`},
+      {title:'Two channels', text:'G measures structural viability — low G predicts external failure. MHI measures divergence between surface performance and structural condition — high MHI flags performed continuation, not failure risk directly.'},
+      {title:'Constraint', text:'Tier classifications are structural diagnostics. They qualify traditional risk measures, not replace them.'}
     ]);
 
     drawLineChart('gTrend', [{name:'Mean G', values:macro.map(r=>r.mean_G)}, {name:'Median G', values:macro.map(r=>r.median_G)}], macro.map(r=>r.Period));
@@ -119,10 +122,10 @@ async function main(){
 
     const c2022 = compare.find(r=>r.Period==='2022Q4');
     const c2019 = compare.find(r=>r.Period==='2019Q4');
-    buildInterp('trendInterp', [
-      {title:'Observation', text:`Relative to 2022Q4, ${latest} is softer: mean G moved from ${fmtNum(c2022?.mean_G,3)} to ${fmtNum(current.mean_G,3)} and median finite MHI moved from ${fmtNum(c2022?.median_MHI_finite,3)} to ${fmtNum(current.median_MHI,3)}.`},
-      {title:'Constraint', text:'The charts show direction and magnitude of change, not the cause of the change.'},
-      {title:'Relevance', text:`Compared with 2019Q4 (${fmtNum(c2019?.mean_G,3)} mean G), current conditions look weaker than 2022Q4’s high-water mark without implying a mass-critical tail.`}
+    buildInterp(‘trendInterp’, [
+      {title:’Observation’, text:`Relative to the 2022Q4 structural high-water mark, ${latest} is softer: mean G (structural viability) fell from ${fmtNum(c2022?.mean_G,3)} to ${fmtNum(current.mean_G,3)}. Median finite MHI (divergence) rose from ${fmtNum(c2022?.median_MHI_finite,3)} to ${fmtNum(current.median_MHI,3)}, indicating widening surface-over-structure gaps.`},
+      {title:’Reading G vs MHI’, text:’Falling G means the structural floor is declining across the system. Rising MHI means surface performance is holding up relative to that declining structure — the gap is growing. These move independently because the two channels share no variables.’},
+      {title:’Constraint’, text:`Compared with 2019Q4 (${fmtNum(c2019?.mean_G,3)} mean G), current conditions sit between 2019 and 2022. The charts show direction and magnitude, not cause.`}
     ]);
 
     const criticalRows = latestRows.filter(r=>r.Tier==='Critical').sort((a,b)=>(b.MHI-a.MHI)).slice(0,10);
@@ -139,9 +142,9 @@ async function main(){
     renderTable('watchTable', watchRows, rankCols, true);
 
     buildInterp('rankInterp', [
-      {title:'Observation', text:'These tables isolate the most severe current-quarter Critical and Watch names using the core fields needed for quick scanning.'},
-      {title:'Constraint', text:'A top rank is a current warning, not a deterministic failure call.'},
-      {title:'Relevance', text:'This is the operational shortlist for inspection and follow-up.'}
+      {title:'Observation', text:'Critical banks are sorted by MHI (widest divergence first). Watch banks are sorted likewise. High MHI means surface performance most exceeds structural condition — it identifies the largest gap, not the highest failure probability.'},
+      {title:'Constraint', text:'G level determines structural severity. MHI ordering within a tier separates banks by how much their surface conceals their structural position. Both matter; they measure different things.'},
+      {title:'Relevance', text:'The ranking separates structurally compromised banks (low G) from structurally compromised banks whose surface metrics mask the compromise (low G, high MHI).'}
     ]);
 
     const currentWatch = latestRows.filter(r=>r.Tier==='Watch');
@@ -164,26 +167,52 @@ async function main(){
     const nw=(trajCounts.find(r=>r.key==='New_Watch')||{}).count||0;
     const bindCounts = countBy(currentWatch,'G_binding');
     buildInterp('cohortInterp', [
-      {title:'Observation', text:`The ${latest} Watch cohort includes ${fmtInt(pw)} persistent Watch rows and ${fmtInt(nw)} new Watch rows, with stress concentrated in ${bindCounts[0]?.key || 'the leading component'}.`},
-      {title:'Constraint', text:'This does not mean every worsening Watch bank will fail; it separates chronic from newly deteriorating names.'},
-      {title:'Relevance', text:'The cohort layer turns the system from static ranking into trajectory-sensitive monitoring.'}
+      {title:'Observation', text:`The ${latest} Watch cohort includes ${fmtInt(pw)} persistent Watch banks and ${fmtInt(nw)} new Watch entries. The dominant binding constraint is ${bindCounts[0]?.key || 'the leading component'} — the structural dimension setting each bank's G floor.`},
+      {title:'Constraint', text:'Watch status means surface exceeds structure (MHI > 1.2) while G is between 0.1 and 0.5. It does not mean imminent failure — many Watch banks persist for years. The binding component identifies which structural weakness is most severe.'},
+      {title:'Relevance', text:'Trajectory class (persistent vs. new vs. escalating) and binding component together describe the character of each bank\'s structural position, not just a single risk score.'}
     ]);
 
-    const medWatchLead=median(failed.map(r=>r.watch_lead_q).filter(Number.isFinite));
-    const medCritLead=median(failed.map(r=>r.critical_lead_q).filter(Number.isFinite));
+    // Baseline characterization — computed from loaded data, not hardcoded
+    const mhiSpread = val.mhi_spread;
+    const gSpread = val.g_spread;
+    const txSpread = val.texas_spread;
+    const mhiMono = val.mhi_monotonic;
+    const gMono = val.g_monotonic;
+    const txMono = val.texas_monotonic;
+    // MHI and G-only have comparable endpoint spreads; MHI's primary advantage is same-band discrimination (Test A).
+    // Texas proxy is materially weaker. Determine which model has the widest monotonic spread.
+    let baselineLabel, baselineSub;
+    if (mhiMono && gMono) {
+      if (Math.abs(mhiSpread - gSpread) < 1.0) {
+        baselineLabel = 'MHI and G-only comparable';
+        baselineSub = 'MHI adds internal same-band lift; Texas weaker';
+      } else if (mhiSpread > gSpread) {
+        baselineLabel = 'MHI widest monotonic spread';
+        baselineSub = 'G-only close on internal target; Texas weaker';
+      } else {
+        baselineLabel = 'G-only widest spread';
+        baselineSub = 'MHI adds internal same-band lift; Texas weaker';
+      }
+    } else {
+      baselineLabel = `MHI spread ${fmtNum(mhiSpread,1)} pp`;
+      baselineSub = `G ${fmtNum(gSpread,1)} pp · Texas ${fmtNum(txSpread,1)} pp`;
+    }
+
+    const medWatchLead = val.median_watch_lead_q;
+    const medCritLead = val.median_critical_lead_q;
     document.getElementById('validationMetrics').innerHTML = `
-      <div class="metric-card"><div class="label">Test A</div><div class="value">1.79x</div><div class="sub">Same-G-band lift</div></div>
-      <div class="metric-card"><div class="label">Baseline</div><div class="value">MHI strongest overall</div><div class="sub">G-only close behind</div></div>
-      <div class="metric-card"><div class="label">Watch lead</div><div class="value">${fmtNum(medWatchLead,0)} quarters</div><div class="sub">Median most-recent Watch lead</div></div>
-      <div class="metric-card"><div class="label">Critical lead</div><div class="value">${fmtNum(medCritLead,0)} quarter</div><div class="sub">Median most-recent Critical lead</div></div>
+      <div class="metric-card"><div class="label">Test A <span class="tag-internal">internal</span></div><div class="value">${fmtNum(val.test_a_lift,2)}x</div><div class="sub">Same-G-band lift (own-tier outcome)</div></div>
+      <div class="metric-card"><div class="label">Baseline <span class="tag-internal">internal</span></div><div class="value">${baselineLabel}</div><div class="sub">${baselineSub} (own-tier outcome)</div></div>
+      <div class="metric-card"><div class="label">Watch lead <span class="tag-external">external</span></div><div class="value">${fmtNum(medWatchLead,0)} quarters</div><div class="sub">Median lead before actual FDIC failure</div></div>
+      <div class="metric-card"><div class="label">Critical lead <span class="tag-external">external</span></div><div class="value">${fmtNum(medCritLead,0)} quarter</div><div class="sub">Median lead before actual FDIC failure</div></div>
     `;
     document.getElementById('failedBankSummary').innerHTML = `
       <div class="anchor-highlight">
-        <div class="anchor-box"><div class="label">Watch layer</div><div class="value">${fmtNum(medWatchLead,0)} quarters</div><div class="sub">Median most-recent lead</div></div>
-        <div class="anchor-box"><div class="label">Critical layer</div><div class="value">${fmtNum(medCritLead,0)} quarter</div><div class="sub">Median most-recent lead</div></div>
+        <div class="anchor-box"><div class="label">Watch layer <span class="tag-external">external</span></div><div class="value">${fmtNum(medWatchLead,0)} quarters</div><div class="sub">Median lead before FDIC failure</div></div>
+        <div class="anchor-box"><div class="label">Critical layer <span class="tag-external">external</span></div><div class="value">${fmtNum(medCritLead,0)} quarter</div><div class="sub">Median lead before FDIC failure</div></div>
       </div>
-      <p class="prose-line"><strong>Observation:</strong> Persistence remains strong: run 1 = 74.17%, run 5 = 88.98%, run 10 = 92.19%.</p>
-      <p class="prose-line"><strong>Relevance:</strong> Failed-bank cross-reference shows Watch as the medium-horizon layer and Critical as the near-failure layer.</p>`;
+      <p class="prose-line"><strong>External anchor:</strong> Failed-bank cross-reference (${fmtInt(val.failed_banks_matched)} matched against FDIC failed bank list) shows Watch as the medium-horizon layer and Critical as the near-failure layer. These lead times are measured against actual closure events, not the system's own tier transitions.</p>
+      <p class="prose-line"><strong>Internal persistence:</strong> Consecutive Watch quarters vs. future Critical entry (own-tier outcome): run 1 = ${fmtNum(val.test_c_run1,2)}%, run 5 = ${fmtNum(val.test_c_run5,2)}%, run 10 = ${fmtNum(val.test_c_run10,2)}%.</p>`;
 
     const matrixRows = [
       {Model:'MHI', D1:baseMHI[0]?.future_deterioration_rate, D10:baseMHI[9]?.future_deterioration_rate, Spread:spread(baseMHI.map(r=>r.future_deterioration_rate))},
@@ -202,11 +231,11 @@ async function main(){
       {name:'G-only', values:baseG.map(r=>r.future_deterioration_rate)},
       {name:'Texas proxy', values:baseTexas.map(r=>r.future_deterioration_rate)}
     ], baseMHI.map(r=>String(r.decile)), {min:0});
-    document.getElementById('baselineCaption').textContent = 'Decile 10 is worst. MHI is the strongest overall ranking signal, G-only is close behind, and the Texas-style proxy is materially weaker.';
+    document.getElementById('baselineCaption').textContent = `Internal-target comparison (own-tier deterioration within 4Q). Decile 10 = worst. MHI spread: ${fmtNum(mhiSpread,1)} pp (monotonic: ${mhiMono?'yes':'no'}). G-only: ${fmtNum(gSpread,1)} pp (monotonic: ${gMono?'yes':'no'}). Texas proxy: ${fmtNum(txSpread,1)} pp (monotonic: ${txMono?'yes':'no'}). MHI and G-only have comparable spread; Texas is materially weaker.`;
     buildInterp('validationInterp', [
-      {title:'Observation', text:'The validation stack remains strong: same-band lift, monotonic ranking, persistence, failed-bank anchoring, and favorable baseline comparison all hold together.'},
-      {title:'Constraint', text:'These checks do not establish universal superiority over proprietary or supervisory models.'},
-      {title:'Relevance', text:'They show that the ranked outputs and cohort interpretations rest on real signal rather than presentation alone.'}
+      {title:'Two validation layers', text:'Internal tests (A, B, C, baseline comparison) confirm that MHI\'s divergence signal is temporally stable, monotonically ordered, and persistent — using the system\'s own tier transitions as outcome. External anchoring (failed-bank lead times, walk-forward testing) confirms that G predicts actual FDIC closure independently of the tier system.'},
+      {title:'What each channel validates', text:'G (structural viability) is the externally validated channel: 13pp decile spread on GFC failure, only metric with full monotonicity on that target. MHI (divergence ratio) is the internally validated channel: strongest monotonic discriminator on own-tier transitions. These are distinct constructs with distinct validation profiles.'},
+      {title:'Constraint', text:'The system qualifies traditional structural risk. G provides a structural viability ranking. MHI identifies where surface performance conceals structural weakness. Neither replaces supervisory or proprietary models.'}
     ]);
 
   } catch(err){

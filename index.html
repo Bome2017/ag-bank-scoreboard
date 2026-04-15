@@ -10,7 +10,7 @@
   <header class="page-header">
     <div>
       <h1>A/G Scoreboard Dashboard</h1>
-      <p class="subhead">Public-data dashboard for A/G bank structural monitoring.</p>
+      <p class="subhead">Structural viability (G) and performed-health divergence (MHI) for every FDIC-insured bank.</p>
     </div>
     <div class="header-meta"><a class="nav-link" href="licensing.html">Commercial Use & Licensing</a> <span id="headerMeta">Loading…</span></div>
   </header>
@@ -19,7 +19,6 @@
     <section class="panel">
       <h2>Data status</h2>
       <div id="loadStatus">Loading…</div>
-      <p class="small" id="statusMeta">Latest quarter: loading · Banks scored: loading · Status: loading</p>
     </section>
 
     <section class="panel">
@@ -89,13 +88,21 @@
       </div>
 
       <p class="small brief-link-row">
-        <a class="inline-link" href="Technical%20Brief.pdf">Technical Brief (PDF)</a> — definitions, validation, and limitations.
+        <a class="inline-link" href="Technical%20Brief%20(Updated).pdf">Technical Brief (PDF)</a> — scoring definitions, validation stack, limitations, and current state.
       </p>
       <p class="small brief-link-row">
-        Supporting Notes:
-        <a class="inline-link" href="AG%20Leakage%20Bias%20Audit%20Memo.pdf">Leakage / Bias Audit Memo (PDF)</a>
+        Supporting notes:
+        <a class="inline-link" href="AG%20Leakage%20Bias%20Audit%20Memo.pdf">Leakage / Bias Audit</a>
         ·
-        <a class="inline-link" href="FAILED_BANK_CASE_NOTE.pdf">Failed-Bank Case Note (PDF)</a>
+        <a class="inline-link" href="FAILED_BANK_CASE_NOTE.pdf">Failed-Bank Case Note</a>
+        ·
+        <a class="inline-link" href="EXTERNAL_ANCHOR_CASE_SET.md">External Anchor Cases</a>
+        ·
+        <a class="inline-link" href="WALKFORWARD_EXTERNAL_VALIDATION.md">Walk-Forward Validation</a>
+        ·
+        <a class="inline-link" href="AGGREGATION_OPERATOR_NOTE.md">Aggregation Operator</a>
+        ·
+        <a class="inline-link" href="BENCHMARK_EXPANSION_NOTE.md">Expanded Benchmarks</a>
       </p>
 
       <div class="interp"><h3>Interpretation</h3><div id="validationInterp"></div></div>
@@ -104,17 +111,13 @@
 
   <footer class="page-footer">
     <div class="footer-card">
-      <h3>Data Provenance &amp; Pipeline Outputs</h3>
-      <ul class="downloads">
-        <li><code>output/macro_mhi_summary.csv</code></li>
-        <li><code>output/compare_2019_2022_2025.csv</code></li>
-        <li><code>output/latest_quarter_temporal.csv</code></li>
-        <li><code>output/baseline_compare_mhi.csv</code></li>
-        <li><code>output/baseline_compare_g.csv</code></li>
-        <li><code>output/baseline_compare_texas_proxy.csv</code></li>
-        <li><code>output/failed_bank_leadtime_summary.csv</code></li>
-      </ul>
-      <p class="small">These files are the direct public-data outputs displayed on this page.</p>
+      <h3>Data Provenance</h3>
+      <p class="small">
+        All data displayed on this page are computed from public FDIC Call Reports
+        (<a class="inline-link" href="https://banks.data.fdic.gov">banks.data.fdic.gov</a>).
+        The scoring pipeline processes 136 quarterly files (1992Q1–2025Q4) with fixed structural
+        transforms and thresholds. No proprietary or confidential data are used.
+      </p>
     </div>
   </footer>
 

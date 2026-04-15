@@ -117,3 +117,9 @@ th{color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--pan
 .brief-link-row + .brief-link-row {
   margin-top: 6px;
 }
+.tag-internal,.tag-external{
+  display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;padding:1px 5px;border-radius:3px;vertical-align:middle;margin-left:4px;
+}
+.tag-internal{background:#2a2415;color:#ffd166;border:1px solid #4a3d1a}
+.tag-external{background:#152a1f;color:#76c893;border:1px solid #1a4a2d}
