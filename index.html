@@ -19,7 +19,7 @@
     <section class="panel">
       <h2>Data status</h2>
       <div id="loadStatus">Loading…</div>
-      <div class="small">Serve this folder with <code>python -m http.server 8000</code> and open <code>http://localhost:8000/</code>.</div>
+      <p class="small" id="statusMeta">Latest quarter: loading · Banks scored: loading · Status: loading</p>
     </section>
 
     <section class="panel">
@@ -87,6 +87,16 @@
         <h3>Baseline comparison matrix</h3>
         <div id="baselineMatrix"></div>
       </div>
+
+      <p class="small brief-link-row">
+        <a class="inline-link" href="Technical%20Brief.pdf">Technical Brief (PDF)</a> — definitions, validation, and limitations.
+      </p>
+      <p class="small brief-link-row">
+        Supporting Notes:
+        <a class="inline-link" href="AG%20Leakage%20Bias%20Audit%20Memo.pdf">Leakage / Bias Audit Memo (PDF)</a>
+        ·
+        <a class="inline-link" href="FAILED_BANK_CASE_NOTE.pdf">Failed-Bank Case Note (PDF)</a>
+      </p>
 
       <div class="interp"><h3>Interpretation</h3><div id="validationInterp"></div></div>
     </section>
