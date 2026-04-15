@@ -122,10 +122,10 @@ async function main(){
 
     const c2022 = compare.find(r=>r.Period==='2022Q4');
     const c2019 = compare.find(r=>r.Period==='2019Q4');
-    buildInterp(‘trendInterp’, [
-      {title:’Observation’, text:`Relative to the 2022Q4 structural high-water mark, ${latest} is softer: mean G (structural viability) fell from ${fmtNum(c2022?.mean_G,3)} to ${fmtNum(current.mean_G,3)}. Median finite MHI (divergence) rose from ${fmtNum(c2022?.median_MHI_finite,3)} to ${fmtNum(current.median_MHI,3)}, indicating widening surface-over-structure gaps.`},
-      {title:’Reading G vs MHI’, text:’Falling G means the structural floor is declining across the system. Rising MHI means surface performance is holding up relative to that declining structure — the gap is growing. These move independently because the two channels share no variables.’},
-      {title:’Constraint’, text:`Compared with 2019Q4 (${fmtNum(c2019?.mean_G,3)} mean G), current conditions sit between 2019 and 2022. The charts show direction and magnitude, not cause.`}
+    buildInterp('trendInterp', [
+      {title:'Observation', text:`Relative to the 2022Q4 structural high-water mark, ${latest} is softer: mean G (structural viability) fell from ${fmtNum(c2022?.mean_G,3)} to ${fmtNum(current.mean_G,3)}. Median finite MHI (divergence) rose from ${fmtNum(c2022?.median_MHI_finite,3)} to ${fmtNum(current.median_MHI,3)}, indicating widening surface-over-structure gaps.`},
+      {title:'Reading G vs MHI', text:'Falling G means the structural floor is declining across the system. Rising MHI means surface performance is holding up relative to that declining structure — the gap is growing. These move independently because the two channels share no variables.'},
+      {title:'Constraint', text:`Compared with 2019Q4 (${fmtNum(c2019?.mean_G,3)} mean G), current conditions sit between 2019 and 2022. The charts show direction and magnitude, not cause.`}
     ]);
 
     const criticalRows = latestRows.filter(r=>r.Tier==='Critical').sort((a,b)=>(b.MHI-a.MHI)).slice(0,10);
