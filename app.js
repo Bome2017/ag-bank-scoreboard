@@ -60,10 +60,15 @@ function drawLineChart(svgId, series, labels, opts={}){
   for(let j=0;j<5;j++){ const yy=pad.t+yr*j/4; html += `<line x1="${pad.l}" y1="${yy}" x2="${width-pad.r}" y2="${yy}" stroke="#313746" stroke-width="1"/>`; const val=max-(max-min)*j/4; html += `<text x="8" y="${yy+4}" fill="#a9b0be" font-size="11">${fmtNum(val,2)}</text>`; }
   const step = Math.max(1, Math.floor(labels.length / 8));
   const tickIdx = [0];
-  for(let i = step; i < labels.length - 1; i += step) tickIdx.push(i);
-  if(tickIdx[tickIdx.length - 1] !== labels.length - 1) tickIdx.push(labels.length - 1);
+  for (let i = step; i < labels.length - 1; i += step) tickIdx.push(i);
+  if (tickIdx[tickIdx.length - 1] !== labels.length - 1) tickIdx.push(labels.length - 1);
+
   tickIdx.forEach(i => {
-    html += `<text x="${x(i)}" y="${height-12}" fill="#a9b0be" font-size="11" text-anchor="middle">${labels[i]}</text>`;
+    const anchor = i === 0 ? 'start' : (i === labels.length - 1 ? 'end' : 'middle');
+    let tx = x(i);
+    if (i === 0) tx += 2;
+    if (i === labels.length - 1) tx -= 2;
+    html += `<text x="${tx}" y="${height-12}" fill="#a9b0be" font-size="11" text-anchor="${anchor}">${labels[i]}</text>`;
   });
   const colors=['#7aa2f7','#76c893','#ffd166'];
   series.forEach((s, idx) => {
