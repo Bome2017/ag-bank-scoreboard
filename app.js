@@ -58,7 +58,13 @@ function drawLineChart(svgId, series, labels, opts={}){
   const x=i=> pad.l + (i/(labels.length-1||1))*xr, y=v=> pad.t + (1-((v-min)/(max-min||1)))*yr;
   let html='';
   for(let j=0;j<5;j++){ const yy=pad.t+yr*j/4; html += `<line x1="${pad.l}" y1="${yy}" x2="${width-pad.r}" y2="${yy}" stroke="#313746" stroke-width="1"/>`; const val=max-(max-min)*j/4; html += `<text x="8" y="${yy+4}" fill="#a9b0be" font-size="11">${fmtNum(val,2)}</text>`; }
-  const step=Math.max(1,Math.floor(labels.length/8)); for(let i=0;i<labels.length;i+=step){ html += `<text x="${x(i)}" y="${height-12}" fill="#a9b0be" font-size="11" text-anchor="middle">${labels[i]}</text>`; }
+  const step = Math.max(1, Math.floor(labels.length / 8));
+  const tickIdx = [0];
+  for(let i = step; i < labels.length - 1; i += step) tickIdx.push(i);
+  if(tickIdx[tickIdx.length - 1] !== labels.length - 1) tickIdx.push(labels.length - 1);
+  tickIdx.forEach(i => {
+    html += `<text x="${x(i)}" y="${height-12}" fill="#a9b0be" font-size="11" text-anchor="middle">${labels[i]}</text>`;
+  });
   const colors=['#7aa2f7','#76c893','#ffd166'];
   series.forEach((s, idx) => {
     const pts=s.values.map((v,i)=> Number.isFinite(v) ? `${x(i)},${y(v)}` : null).filter(Boolean).join(' ');
