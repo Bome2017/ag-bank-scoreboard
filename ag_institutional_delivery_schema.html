@@ -148,7 +148,7 @@
           </li>
           <li class="status-item">
             <span class="dot c"></span>
-            <div><strong>Dual-feed option</strong><br><span class="subhead">Optional institutional reporting of both Min-G and Mean-G.</span></div>
+            <div><strong>Dual-feed option</strong><br><span class="subhead">Optional institutional reporting of both canonical Min-G and companion Mean-G, with distinct diagnostic roles.</span></div>
           </li>
         </ul>
       </aside>
@@ -166,7 +166,8 @@
         <p class="mini-note">
           Where the dual structural feed is provided, <code>G_MIN</code> remains the canonical bottleneck structural-viability channel
           used by the A/G instrument for tier construction and diagnostic sensitivity. <code>G_MEAN</code> is provided as a companion
-          aggregate structural-condition measure for broader summary, comparison, or client-side external-tracking use.
+          aggregate structural-condition measure for broader summary, comparison, or client-side external tracking. In current-quarter outputs,
+          <code>G_MEAN</code> is consistently greater than or equal to <code>G_MIN</code>, and the gap is largest in canonical Watch and Critical names.
         </p>
       </section>
 
@@ -208,7 +209,7 @@
               <tr><td>CERT</td><td>Integer</td><td>&gt; 0</td><td>Unique FDIC Certificate Number. Primary institution key.</td></tr>
               <tr><td>OBS_QUARTER</td><td>String</td><td>YYYYQ#</td><td>Observation quarter for the scored FDIC Call Report data.</td></tr>
               <tr><td>G_MIN</td><td>Float</td><td>0.000–1.000</td><td>Canonical structural viability score. Computed using the minimum operator across transformed structural components in order to enforce the bottleneck axiom.</td></tr>
-              <tr><td>G_MEAN</td><td>Float</td><td>0.000–1.000</td><td>Companion aggregate structural-condition score. Computed using the arithmetic mean across transformed structural components. Included only where dual-feed delivery is in scope.</td></tr>
+              <tr><td>G_MEAN</td><td>Float</td><td>0.000–1.000</td><td>Companion aggregate structural-condition score. Computed using the arithmetic mean across transformed structural components. Typically smoother and less bottleneck-sensitive than <code>G_MIN</code>. Included only where dual-feed delivery is in scope.</td></tr>
               <tr><td>MHI_FINITE</td><td>Float</td><td>&gt;= 0 finite</td><td>Performed-health divergence ratio, defined as Appearance / G_MIN for finite-valued observations. Identifies how far surface performance exceeds structural condition.</td></tr>
               <tr><td>BINDING_COMP</td><td>String</td><td>Categorical</td><td>Structural component setting the G_MIN floor in the current quarter.</td></tr>
               <tr><td>TIER_CLASS</td><td>String</td><td>Categorical</td><td>Structural diagnostic classification, including Critical, Watch, Diverging, and Stable, as defined by the current A/G methodology.</td></tr>
@@ -232,7 +233,7 @@
             </thead>
             <tbody>
               <tr><td>DELTA_G</td><td>Float</td><td>typically -1.000–1.000</td><td>Quarter-over-quarter change in G_MIN, computed as current-quarter G_MIN minus prior-quarter G_MIN for the same CERT. Negative values indicate structural deterioration.</td></tr>
-              <tr><td>DELTA_G_MEAN</td><td>Float</td><td>typically -1.000–1.000</td><td>Quarter-over-quarter change in G_MEAN, computed as current-quarter G_MEAN minus prior-quarter G_MEAN for the same CERT. Included only where dual-feed delivery is in scope.</td></tr>
+              <tr><td>DELTA_G_MEAN</td><td>Float</td><td>typically -1.000–1.000</td><td>Quarter-over-quarter change in <code>G_MEAN</code>, computed as current-quarter <code>G_MEAN</code> minus prior-quarter <code>G_MEAN</code> for the same <code>CERT</code>. Typically smoother and less volatile than <code>DELTA_G</code>. Included only where dual-feed delivery is in scope.</td></tr>
               <tr><td>DELTA_MHI</td><td>Float</td><td>signed finite range</td><td>Quarter-over-quarter change in MHI_FINITE, computed as current-quarter MHI_FINITE minus prior-quarter MHI_FINITE for the same CERT. Positive values indicate widening surface-over-structure divergence.</td></tr>
               <tr><td>WATCH_RUN</td><td>Integer</td><td>&gt;= 0</td><td>Number of consecutive quarters, including the current quarter, in which the institution has remained in Watch without interruption. Resets to 0 when current-quarter TIER_CLASS is not Watch.</td></tr>
               <tr><td>CRITICAL_RUN</td><td>Integer</td><td>&gt;= 0</td><td>Number of consecutive quarters, including the current quarter, in which the institution has remained in Critical without interruption. Resets to 0 when current-quarter TIER_CLASS is not Critical.</td></tr>
@@ -254,8 +255,9 @@
         <ul class="list">
           <li><code>G_MIN</code>, <code>G_MEAN</code>, and <code>MHI_FINITE</code> are not interchangeable.</li>
           <li><code>G_MIN</code> is the canonical bottleneck structural-viability measure used by the A/G instrument for structural diagnostics and tier construction.</li>
-          <li><code>G_MEAN</code>, where delivered, is a companion aggregate structural-condition measure.</li>
+          <li><code>G_MEAN</code>, where delivered, is a companion aggregate structural-condition measure and should not be treated as a replacement for <code>G_MIN</code>.</li>
           <li><code>MHI_FINITE</code> is a divergence measure identifying how far surface performance exceeds structural condition.</li>
+          <li>In current-quarter outputs, Mean-G preserves the stable base but softens many canonical Watch and Critical names into less severe aggregate states, confirming complementarity rather than redundancy.</li>
         </ul>
       </section>
 
@@ -266,6 +268,9 @@
           Any material change affecting canonical field definitions, tier logic, or calculation methodology for core fields such as
           <code>G_MIN</code> or <code>MHI_FINITE</code> will be documented in an updated schema, revision notice, or accompanying methodology document
           delivered with or prior to the affected release.
+        </p>
+        <p class="mini-note">
+          Companion fields such as <code>G_MEAN</code> and <code>DELTA_G_MEAN</code> may be extended or refined over time without altering the canonical role of <code>G_MIN</code> unless expressly stated otherwise in writing.
         </p>
       </section>
 
