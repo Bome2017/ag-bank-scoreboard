@@ -75,6 +75,20 @@
 
     <section class="panel">
       <h2>Validation panel</h2>
+      <p class="small claim-discipline-note">
+        <strong>Reading the validation layer.</strong>
+        Internal tests (same-G-band lift, decile monotonicity, persistence escalation)
+        use the system's own tier transitions as the outcome variable; they are
+        coherence checks, not external-failure prediction. On the external failed-bank
+        anchor and walk-forward distress targets, <strong>G alone is the dominant
+        external predictor</strong> and the same-band lift inverts — within a weak-G band,
+        high-MHI banks are <em>less</em> likely to fail externally than low-MHI banks.
+        G carries the main external failure signal; MHI is better read as a divergence
+        and internal tier-coherence diagnostic, not as a replacement for G on external
+        failure prediction.
+        See <a class="inline-link" href="WALKFORWARD_EXTERNAL_VALIDATION.md">Walk-Forward
+        External Validation</a> §6–9 for the full result.
+      </p>
       <div class="validation-grid">
         <div class="card">
           <h3>Key validation findings</h3>
@@ -131,6 +145,19 @@
         The scoring pipeline processes 136 quarterly files (1992Q1–2025Q4) with fixed structural
         transforms and thresholds. No proprietary or confidential data are used.
       </p>
+    </div>
+    <div class="footer-card">
+      <h3>Related Public Demos</h3>
+      <p class="small">
+        Related public demos from the same project family. Each demo has its own
+        scope, assumptions, validation status, and limitation notes.
+      </p>
+      <ul class="downloads small">
+        <li><a class="inline-link" href="https://bome2017.github.io/ag-higher-education/">A/G Higher Education</a> — exploratory A/G-style higher-education institutional risk/stability demo with explicit data-scope limits.</li>
+        <li><a class="inline-link" href="https://bome2017.github.io/ag-corporate-filings/">A/G Corporate Filings</a> — corporate filings extension exploring A/G-style distress and disclosure signals from public company filings.</li>
+        <li><a class="inline-link" href="https://bome2017.github.io/Replay-Verifier/">Track B Bounded Replay-Risk Audit</a> — bounded workflow replay-risk demo for scoped AI-agent/SaaS workflows within a configured model and bound.</li>
+      </ul>
+      <p class="small">Scope and assumptions differ by demo.</p>
     </div>
   </footer>
 

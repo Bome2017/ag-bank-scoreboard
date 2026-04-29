@@ -12,6 +12,7 @@ h1{font-size:28px}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:18px}
 .page-footer{max-width:1400px;margin:0 auto 24px;padding:0 18px}
 .footer-card{background:#13161d;border:1px solid var(--line);border-radius:14px;padding:16px;color:var(--muted)}
+.footer-card + .footer-card{margin-top:12px}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
 .stat,.card{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px}
 .stat .label{color:var(--muted);font-size:13px}
