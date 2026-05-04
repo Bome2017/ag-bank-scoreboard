@@ -3,6 +3,7 @@
 **Date:** April 15, 2026
 **Status:** Design-choice defense with empirical evidence across four operators
 **Depends on:** `sensitivity_analysis.py`, `output/sensitivity_summary.csv`, walk-forward and benchmark expansion results
+**Companion (2026-04-19):** `LAMBDA_FAMILY_BRIDGE_NOTE.md` — formalizes the one-parameter λ interpolation `G = λ · min(g) + (1 − λ) · mean(g)` used by the cross-domain canonical engine, and records that the NHANES λ sweep is consistent with the Aggregator Doctrine's rot-domain prescription (one domain, not a universal claim). The bank scoreboard's pure-min commitment defended here corresponds to the λ → 1 end of that dial. NHANES does not, by itself, defend the λ → 1 end — it bears only on low-λ behavior in a rot-dominant domain. The bank-scoreboard defense stands or falls on the bank-side evidence in this note, not on NHANES.
 
 ---
 
