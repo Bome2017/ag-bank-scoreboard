@@ -101,6 +101,8 @@ async function main(){
     const baseTexas = parseCSV(texasTxt).map(r => ({...r,decile:toNum(r.decile),future_deterioration_rate:toNum(r.future_deterioration_rate)}));
     const failed = parseCSV(failedTxt).map(r => ({...r,watch_lead_q:toNum(r.watch_lead_q),critical_lead_q:toNum(r.critical_lead_q)}));
     const val = parseCSV(validationTxt).map(r => {const o={}; for(const k in r) o[k]=toNum(r[k]); return o;})[0];
+    const currentFailedCount = failed.length;
+    const frozenMatchedCount = val.failed_banks_matched;
 
     const latest = latestPeriod(macro);
     const current = macro.find(r => r.Period === latest);
@@ -214,15 +216,15 @@ async function main(){
     document.getElementById('validationMetrics').innerHTML = `
       <div class="metric-card"><div class="label">Test A <span class="tag-internal">internal</span></div><div class="value">${fmtNum(val.test_a_lift,2)}x</div><div class="sub">Same-G-band lift (own-tier outcome)</div></div>
       <div class="metric-card"><div class="label">Baseline <span class="tag-internal">internal</span></div><div class="value">${baselineLabel}</div><div class="sub">${baselineSub} (own-tier outcome)</div></div>
-      <div class="metric-card"><div class="label">Watch lead <span class="tag-external">external</span></div><div class="value">${fmtNum(medWatchLead,0)} quarters</div><div class="sub">Median lead before actual FDIC failure</div></div>
-      <div class="metric-card"><div class="label">Critical lead <span class="tag-external">external</span></div><div class="value">${fmtNum(medCritLead,0)} quarter</div><div class="sub">Median lead before actual FDIC failure</div></div>
+      <div class="metric-card"><div class="label">Watch lead <span class="tag-external">external</span></div><div class="value">${fmtNum(medWatchLead,0)} quarters</div><div class="sub">Frozen April validation median</div></div>
+      <div class="metric-card"><div class="label">Critical lead <span class="tag-external">external</span></div><div class="value">${fmtNum(medCritLead,0)} quarter</div><div class="sub">Frozen April validation median</div></div>
     `;
     document.getElementById('failedBankSummary').innerHTML = `
       <div class="anchor-highlight">
-        <div class="anchor-box"><div class="label">Watch layer <span class="tag-external">external</span></div><div class="value">${fmtNum(medWatchLead,0)} quarters</div><div class="sub">Median lead before FDIC failure</div></div>
-        <div class="anchor-box"><div class="label">Critical layer <span class="tag-external">external</span></div><div class="value">${fmtNum(medCritLead,0)} quarter</div><div class="sub">Median lead before FDIC failure</div></div>
+        <div class="anchor-box"><div class="label">Watch layer <span class="tag-external">external</span></div><div class="value">${fmtNum(medWatchLead,0)} quarters</div><div class="sub">Frozen April validation median</div></div>
+        <div class="anchor-box"><div class="label">Critical layer <span class="tag-external">external</span></div><div class="value">${fmtNum(medCritLead,0)} quarter</div><div class="sub">Frozen April validation median</div></div>
       </div>
-      <p class="prose-line"><strong>External anchor:</strong> Failed-bank cross-reference (${fmtInt(val.failed_banks_matched)} matched against FDIC failed bank list) shows Watch as the medium-horizon layer and Critical as the near-failure layer. These lead times are measured against actual closure events, not the system's own tier transitions.</p>
+      <p class="prose-line"><strong>External anchor:</strong> Current May 2026 failed-bank source population: ${fmtInt(currentFailedCount)} records. Frozen April validation cross-reference: ${fmtInt(frozenMatchedCount)} matched banks. The lead-time medians shown here come from the frozen validation summary, so the 573 matched count is not presented as the current refreshed failed-bank population.</p>
       <p class="prose-line"><strong>Internal persistence:</strong> Consecutive Watch quarters vs. future Critical entry (own-tier outcome): run 1 = ${fmtNum(val.test_c_run1,2)}%, run 5 = ${fmtNum(val.test_c_run5,2)}%, run 10 = ${fmtNum(val.test_c_run10,2)}%.</p>`;
 
     const matrixRows = [
